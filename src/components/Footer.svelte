@@ -8,8 +8,6 @@
 
     <div className="grid grid-flow-rows py-4">
         <h2>Contact me</h2>
-        <span>+57 3185274636</span>
-        <span>+57 3024510763</span>
         <a  target="_blank" href="mailto:arenaspierre@protonmail.com">arenaspierre@protonmail.com</a>
     </div>
 

@@ -1,16 +1,23 @@
-const production = !process.env.ROLLUP_WATCH;
-const purgecss = require("@fullhuman/postcss-purgecss");
+//postcss.config.js
+
+const tailwindcss = require("tailwindcss");
+
+const cssnano = require("cssnano")({ preset: 'default', });
+
+// only needed if you want to purge
+const purgecss = require("@fullhuman/postcss-purgecss")({
+    content: ["./src/**/*.svelte", "./public/**/*.html"],
+    defaultExtractor: content => content.match(/[A-Za-z0-9-_:/]+/g) || []
+});
 
 module.exports = {
     plugins: [
-        require("postcss-import")(),
-        require("tailwindcss"),
-        require("autoprefixer"),
-        // Only purge css on production
-        production &&
-        purgecss({
-            content: ["./**/*.html", "./**/*.svelte"],
-            defaultExtractor: content => content.match(/[A-Za-z0-9-_:/]+/g) || []
-        })
+        tailwindcss("./tailwind.config.js"),
+
+        // minify the css only in production
+        ...(process.env.NODE_ENV === "production" ? [cssnano] : []),
+
+        // only needed if you want to purge
+        ...(process.env.NODE_ENV === "production" ? [purgecss] : [])
     ]
 };
