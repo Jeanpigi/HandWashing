@@ -1,12 +1,12 @@
 <script>
-    import { onDestroy, createEventDispatcher } from 'svelte';
     import ProgressBar from './ProgressBar.svelte';
 
+    let { onend } = $props();
+
     const totalSeconds = 20;
-    let secondsLeft = totalSeconds;
-    let isRunning = false;
-    $: progress = ((totalSeconds - secondsLeft) / totalSeconds) * 100;
-    const dispatch = createEventDispatcher();
+    let secondsLeft = $state(totalSeconds);
+    let isRunning = $state(false);
+    let progress = $derived(((totalSeconds - secondsLeft) / totalSeconds) * 100);
 
     let intervalId;
 
@@ -19,13 +19,15 @@
                 clearInterval(intervalId);
                 isRunning = false;
                 secondsLeft = totalSeconds;
-                dispatch('end', 'end timer');
+                onend?.();
             }
         }, 1000);
     }
 
-    onDestroy(() => {
-        if (intervalId) clearInterval(intervalId);
+    $effect(() => {
+        return () => {
+            if (intervalId) clearInterval(intervalId);
+        };
     });
 </script>
 
@@ -43,7 +45,7 @@
         <button
             class="w-full sm:w-auto rounded-full bg-brand-600 hover:bg-brand-500 active:bg-brand-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors py-3 px-10 text-center font-semibold text-white shadow-sm"
             disabled={isRunning}
-            on:click={startTimer}
+            onclick={startTimer}
         >
             {isRunning ? 'Washing…' : 'Start'}
         </button>
